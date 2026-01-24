@@ -23,7 +23,6 @@ import { X } from "lucide-react"
 import { toast } from "sonner"
 import axios from "axios"
 import { ApiResponse } from "@/src/types/ApiResponse"
-import { success } from "zod"
 
 interface Message {
   _id: string;
@@ -44,7 +43,7 @@ const MessageCard = ({message, onmessageDelete}: MessageCardProps) => {
     <div>
       <Card>
         <CardHeader>
-          <CardTitle>Card Title</CardTitle>
+          <CardTitle>{message.content}</CardTitle>
           <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="destructive"><X className = "w-5 h-5"/></Button>
@@ -53,8 +52,7 @@ const MessageCard = ({message, onmessageDelete}: MessageCardProps) => {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete your
-                    account and remove your data from our servers.
+                    Alert!!. This will permanently delete your message.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -63,8 +61,6 @@ const MessageCard = ({message, onmessageDelete}: MessageCardProps) => {
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
-          <CardDescription>Card Description</CardDescription>
-          <CardAction>Card Action</CardAction>
         </CardHeader>
         <CardContent>
         </CardContent>
