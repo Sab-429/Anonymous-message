@@ -87,7 +87,6 @@ const PublicProfilePage = () => {
   }
 }
 
-
   return (
     <div className="min-h-screen flex justify-center items-center px-4">
       <div className="w-full max-w-xl bg-white p-6 rounded shadow">

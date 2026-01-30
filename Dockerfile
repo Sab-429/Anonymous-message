@@ -1,33 +1,24 @@
-# ----------- Builder stage -----------
+# ---------- BUILD ----------
 FROM node:20-alpine AS builder
-
 WORKDIR /app
 
-# Copy only package files first (better caching)
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Install ALL deps (including devDependencies for build)
-RUN npm install
-
-# Copy rest of the code
 COPY . .
-
-# Build Next.js
 RUN npm run build
 
-ARG RESEND_API_KEY
 
-ENV RESEND_API_KEY=$RESEND_API_KEY
-
-RUN npm run build
-
-# ----------- Production stage -----------
-FROM node:20-alpine AS runner
-
+# ---------- RUN ----------
+FROM node:20-alpine
 WORKDIR /app
 
-COPY --from=builder /app ./
+ENV NODE_ENV=production
+
+# standalone server (already includes required node_modules)
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/public ./public
 
 EXPOSE 3000
-
-CMD ["npm", "run", "dev"]
+CMD ["node", "server.js"]

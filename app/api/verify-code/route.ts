@@ -1,6 +1,5 @@
 import dbconnect from "@/src/lib/mongoodb";
 import UserModel from "@/src/model/user.model";
-import { success } from "zod";
 
 export async function POST(request:Request){
     await dbconnect()

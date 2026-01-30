@@ -2,7 +2,7 @@ import { RateLimit } from '@/src/model/RateLimit.model'
 import dbConnect from '@/src/lib/mongoodb'
 
 const WINDOW_MS = 10 * 60 * 1000 
-const MAX_REQUESTS = 7
+const MAX_REQUESTS = 10
 
 export async function rateLimit(ip: string) {
   await dbConnect()

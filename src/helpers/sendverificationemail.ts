@@ -2,7 +2,6 @@ import { getResendClient } from "@/src/lib/resend";
 import verificationemail from "@/emails/verificationemail"
 import {ApiResponse} from "@/src/types/ApiResponse"
 
-
 export async function sendverificationemail(
     email: string,
     username : string,
@@ -13,7 +12,7 @@ export async function sendverificationemail(
         await resend.emails.send({
         from: "Auth <auth@sabyasachisaha.in>",
         to: email,
-        subject: 'Mystry message | Verification code',
+        subject: ' Verification code',
         react: verificationemail({username,otp:verifyCode})
     });
         return {success: true,message:'Verifiaction email send successfully'}
