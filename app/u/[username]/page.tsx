@@ -18,11 +18,13 @@ interface PublicProfileResponse {
 const PublicProfilePage = () => {
   const { username } = useParams<{ username: string }>()
   const [content, setContent] = useState('')
+  const [email, setemail] = useState('')
   const [loading, setLoading] = useState(false)
   const [accepting, setAccepting] = useState(false)
   const [suggestions, setSuggestions] = useState<string[]>([])
 
   useEffect(() => {
+    if (!username) return
     const fetchProfile = async () => {
       try {
         const res = await axios.get<ApiResponse>(
@@ -44,8 +46,13 @@ const PublicProfilePage = () => {
   }, [username])
 
   const handleSendMessage = async () => {
-    if (!content.trim()) {
-      toast.error('Message cannot be empty')
+    if (!email.trim() || !content.trim()) {
+      toast.error('Email and message are required')
+      return
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      toast.error('Enter a valid email')
       return
     }
 
@@ -55,10 +62,12 @@ const PublicProfilePage = () => {
       const res = await axios.post('/api/send-message', {
         username,
         content,
+        email,
       })
 
       if (res.data.success) {
         toast.success('Message sent anonymously')
+        setemail('')
         setContent('')
       } else {
         toast.error(res.data.message)
@@ -73,25 +82,25 @@ const PublicProfilePage = () => {
     }
   }
 
- const fetchSuggestions = async () => {
-  try {
-    const res = await axios.get('/api/suggest-message')
+  const fetchSuggestions = async () => {
+    try {
+      const res = await axios.get('/api/suggest-message')
 
-    if (res.data.success && Array.isArray(res.data.suggestions)) {
-      setSuggestions(res.data.suggestions)
-    } else {
-      toast.error('No suggestions available')
+      if (res.data.success && Array.isArray(res.data.suggestions)) {
+        setSuggestions(res.data.suggestions)
+      } else {
+        toast.error('No suggestions available')
+      }
+    } catch {
+      toast.error('Failed to load suggestions')
     }
-  } catch {
-    toast.error('Failed to load suggestions')
   }
-}
 
   return (
     <div className="min-h-screen flex justify-center items-center px-4">
       <div className="w-full max-w-xl bg-white p-6 rounded shadow">
         <h1 className="text-3xl font-bold mb-2 text-center">
-          Send an anonymous message and check your Dashboard
+          Send an anonymous message
         </h1>
 
         <p className="text-center text-muted-foreground mb-6">
@@ -104,6 +113,13 @@ const PublicProfilePage = () => {
           </p>
         ) : (
           <>
+            <input
+              type='email'
+              placeholder='Enter Your email'
+              value={email}
+              onChange={(e) => setemail(e.target.value)}
+              className='w-full mb-4 border rounded px-3 py-2'
+            />
             <Textarea
               placeholder="Write your anonymous message here..."
               value={content}

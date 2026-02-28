@@ -1,6 +1,6 @@
 import suggestions from "@/src/data/suggestion"
 
-export function getRandomSuggestions(count = 3) {
+export function getRandomSuggestions(count = 4) {
   if (!suggestions.length) return []
 
   const shuffled = [...suggestions].sort(() => 0.5 - Math.random())

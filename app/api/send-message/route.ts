@@ -1,36 +1,36 @@
 import dbconnect from "@/src/lib/mongoodb"
 import UserModel from "@/src/model/user.model"
-import { rateLimit } from '@/src/lib/rateLimit'
-import { headers } from 'next/headers'
+import { RateLimit } from "@/src/model/RateLimit.model"
+
 
 export async function POST(req: Request) {
-  const headersList = headers()
-const ip =
-  (await headersList).get('x-forwarded-for')?.split(',')[0] ||
-  '127.0.0.1'
-
-const { allowed } = await rateLimit(ip)
-
-if (!allowed) {
-  return Response.json(
-    {
-      success: false,
-      message: 'Too many messages sent. Please try later.',
-    },
-    { status: 429 }
-  )
-}
-
   await dbconnect()
-  const { username, content } = await req.json()
 
-  if (!username || !content) {
+  const { username, content , email } = await req.json()
+
+  if (!username || !content || !email) {
     return Response.json(
       { success: false, message: "Invalid data" },
       { status: 400 }
     )
   }
-
+  const LIMIT = 3;
+  let limiter = await RateLimit.findOne({email})
+  if(!limiter) {
+    limiter = await RateLimit.create({email,count: 1})
+  }else{
+    if(limiter.count >= LIMIT){
+      return Response.json(
+        {
+          success: false,
+          message: "Limit reached"
+        },
+        {status: 403}
+      )
+    }
+    limiter.count += 1;
+    await limiter.save()
+  }
   const user = await UserModel.findOne({ username })
 
   if (!user) {
@@ -51,6 +51,7 @@ if (!allowed) {
     content,
     createdAt: new Date(),
   } as any)
+
   await user.save()
 
   return Response.json(
