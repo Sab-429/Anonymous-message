@@ -56,6 +56,7 @@ const DashboardPage = () => {
   }
 
   const fetchMessages = async (refresh = false) => {
+    if(!getValues('acceptMessages')) return ;
     setIsLoading(true)
     try {
       const res = await axios.get<ApiResponse>('/api/get-messages')
@@ -97,12 +98,14 @@ const DashboardPage = () => {
       `${window.location.protocol}//${window.location.host}`
     )
 
-    ;(async () => {
-      const isAccepting = await fetchAcceptMessage()
-      if (isAccepting) {
-        fetchMessages()
-      }
-    })()
+      ; (async () => {
+        const isAccepting = await fetchAcceptMessage()
+        if (isAccepting === true) {
+          await fetchMessages()
+        }else{
+          setMessages([])
+        }
+      })()
   }, [session?.user])
 
   if (!session?.user) {
